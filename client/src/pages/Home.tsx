@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 
 /**
  * Design Philosophy: Minimalist Institutional
@@ -92,16 +92,43 @@ This document has been produced under the oversight of the CONAS Faction Leader 
   },
 ];
 
+interface TableOfContentsItem {
+  id: string;
+  label: string;
+  subsections?: Array<{ id: string; label: string }>;
+}
+
 export default function Home() {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
   const [activeSection, setActiveSection] = useState<string>('logo-section');
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    new Set(['civil-section', 'defense-section'])
+  );
 
-  const tableOfContents = [
+  const tableOfContents: TableOfContentsItem[] = [
     { id: 'logo-section', label: 'Overview' },
     { id: 'overview-section', label: 'What is CONAS?' },
     { id: 'objectives-section', label: 'Strategic Objectives' },
-    { id: 'civil-section', label: 'Civil Branch' },
-    { id: 'defense-section', label: 'Defense Branch' },
+    {
+      id: 'civil-section',
+      label: 'Civil Branch',
+      subsections: [
+        { id: 'civil-oda', label: 'Office of Diplomatic Affairs' },
+        { id: 'civil-da', label: 'Division and Allocation' },
+        { id: 'civil-efid', label: 'External Financial Investigations' },
+        { id: 'civil-le', label: 'Logistics and Engineering' },
+      ],
+    },
+    {
+      id: 'defense-section',
+      label: 'Defense Branch',
+      subsections: [
+        { id: 'defense-p1', label: 'Praetor-1 "Silent Watch"' },
+        { id: 'defense-merc', label: 'Medical Emergency Response Corps' },
+        { id: 'defense-aegis', label: 'A.E.G.I.S.' },
+        { id: 'defense-vigil', label: 'V.I.G.I.L.' },
+      ],
+    },
     { id: 'ack-section', label: 'Acknowledgements' },
   ];
 
@@ -138,26 +165,75 @@ export default function Home() {
     }
   };
 
+  const toggleExpanded = (sectionId: string) => {
+    setExpandedSections((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(sectionId)) {
+        newSet.delete(sectionId);
+      } else {
+        newSet.add(sectionId);
+      }
+      return newSet;
+    });
+  };
+
+  const isSectionExpandable = (item: TableOfContentsItem) =>
+    item.subsections && item.subsections.length > 0;
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Table of Contents Sidebar - Mobile Friendly */}
       <aside className="hidden lg:block fixed left-0 top-0 w-64 h-screen bg-card border-r border-border pt-24 overflow-y-auto">
         <nav className="px-6 py-8">
           <h3 className="text-sm font-semibold text-accent uppercase tracking-wide mb-6">Contents</h3>
-          <ul className="space-y-3">
+          <ul className="space-y-2">
             {tableOfContents.map((item) => (
               <li key={item.id}>
-                <button
-                  onClick={() => scrollToSection(item.id)}
-                  className={`flex items-center gap-2 text-sm transition-all duration-200 ${
-                    activeSection === item.id
-                      ? 'text-accent font-semibold'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {activeSection === item.id && <ChevronRight className="w-4 h-4" />}
-                  <span>{item.label}</span>
-                </button>
+                <div className="flex items-center">
+                  <button
+                    onClick={() => scrollToSection(item.id)}
+                    className={`flex-1 flex items-center gap-2 text-sm transition-all duration-200 py-1 px-2 rounded ${
+                      activeSection === item.id
+                        ? 'text-accent font-semibold bg-accent/10'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
+                    }`}
+                  >
+                    {activeSection === item.id && (
+                      <ChevronRight className="w-3 h-3 flex-shrink-0" />
+                    )}
+                    <span>{item.label}</span>
+                  </button>
+                  {isSectionExpandable(item) && (
+                    <button
+                      onClick={() => toggleExpanded(item.id)}
+                      className="p-1 hover:bg-muted/30 rounded transition-colors"
+                      aria-label={
+                        expandedSections.has(item.id) ? 'Collapse' : 'Expand'
+                      }
+                    >
+                      {expandedSections.has(item.id) ? (
+                        <ChevronDown className="w-4 h-4 text-accent" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                      )}
+                    </button>
+                  )}
+                </div>
+                {isSectionExpandable(item) && expandedSections.has(item.id) && (
+                  <ul className="ml-4 mt-1 space-y-1 border-l border-border pl-3">
+                    {item.subsections!.map((sub) => (
+                      <li key={sub.id}>
+                        <button
+                          onClick={() => scrollToSection(item.id)}
+                          className="flex items-center gap-2 text-xs transition-all duration-200 py-1 px-2 rounded text-muted-foreground hover:text-foreground hover:bg-muted/30 w-full text-left"
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full bg-accent/50 flex-shrink-0" />
+                          <span>{sub.label}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
           </ul>
