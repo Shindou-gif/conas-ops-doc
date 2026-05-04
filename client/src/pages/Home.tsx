@@ -421,12 +421,19 @@ export default function Home() {
           }`}
         >
           <h2 className="text-4xl font-bold text-accent mb-6">Acknowledgements</h2>
-          <div className="bg-card rounded-lg p-8 border border-border">
-            <p className="text-foreground leading-relaxed">
-              <span className="font-semibold text-accent">Document Author:</span> ProLockMaster –
-              CONAS Faction Leader
-            </p>
-            <p className="text-sm text-muted-foreground mt-4">
+          <div className="bg-card rounded-lg p-8 border border-border space-y-6">
+            <div>
+              <p className="text-foreground leading-relaxed">
+                <span className="font-semibold text-accent">Document Author:</span> ProLockMaster –
+                CONAS Faction Leader
+              </p>
+            </div>
+            <div className="border-t border-border pt-6">
+              <p className="text-foreground leading-relaxed">
+                <span className="font-semibold text-accent">Website Creator:</span> Shinouyu & Manus
+              </p>
+            </div>
+            <p className="text-sm text-muted-foreground">
               This document has been produced under the oversight of the CONAS Faction Leader and
               is designated as Out of Roleplay (OOR) material.
             </p>
