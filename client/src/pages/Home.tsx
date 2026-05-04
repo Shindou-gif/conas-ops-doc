@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ChevronRight, ChevronDown } from 'lucide-react';
+import { ChevronRight, ChevronDown, Search, X } from 'lucide-react';
 
 /**
  * Design Philosophy: Minimalist Institutional
@@ -104,6 +104,7 @@ export default function Home() {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set(['civil-section', 'defense-section'])
   );
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const tableOfContents: TableOfContentsItem[] = [
     { id: 'logo-section', label: 'Overview' },
@@ -180,62 +181,115 @@ export default function Home() {
   const isSectionExpandable = (item: TableOfContentsItem) =>
     item.subsections && item.subsections.length > 0;
 
+  const filterTableOfContents = () => {
+    if (!searchQuery.trim()) return tableOfContents;
+
+    return tableOfContents
+      .map((item) => {
+        const labelMatches = item.label
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
+        const subsectionsMatch = item.subsections?.filter((sub) =>
+          sub.label.toLowerCase().includes(searchQuery.toLowerCase())
+        ) || [];
+
+        if (labelMatches || subsectionsMatch.length > 0) {
+          return {
+            ...item,
+            subsections: subsectionsMatch.length > 0 ? subsectionsMatch : item.subsections,
+          };
+        }
+        return null;
+      })
+      .filter((item) => item !== null) as TableOfContentsItem[];
+  };
+
+  const filteredContents = filterTableOfContents();
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Table of Contents Sidebar - Mobile Friendly */}
       <aside className="hidden lg:block fixed left-0 top-0 w-64 h-screen bg-card border-r border-border pt-24 overflow-y-auto">
         <nav className="px-6 py-8">
-          <h3 className="text-sm font-semibold text-accent uppercase tracking-wide mb-6">Contents</h3>
+          <h3 className="text-sm font-semibold text-accent uppercase tracking-wide mb-4">Contents</h3>
+          
+          {/* Search Bar */}
+          <div className="relative mb-6">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search sections..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-8 py-2 text-sm bg-muted/50 border border-border rounded-md text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:bg-background transition-colors"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 hover:bg-muted rounded transition-colors"
+                aria-label="Clear search"
+              >
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            )}
+          </div>
+
           <ul className="space-y-2">
-            {tableOfContents.map((item) => (
-              <li key={item.id}>
-                <div className="flex items-center">
-                  <button
-                    onClick={() => scrollToSection(item.id)}
-                    className={`flex-1 flex items-center gap-2 text-sm transition-all duration-200 py-1 px-2 rounded ${
-                      activeSection === item.id
-                        ? 'text-accent font-semibold bg-accent/10'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
-                    }`}
-                  >
-                    {activeSection === item.id && (
-                      <ChevronRight className="w-3 h-3 flex-shrink-0" />
-                    )}
-                    <span>{item.label}</span>
-                  </button>
-                  {isSectionExpandable(item) && (
+            {filteredContents.length > 0 ? (
+              filteredContents.map((item) => (
+                <li key={item.id}>
+                  <div className="flex items-center">
                     <button
-                      onClick={() => toggleExpanded(item.id)}
-                      className="p-1 hover:bg-muted/30 rounded transition-colors"
-                      aria-label={
-                        expandedSections.has(item.id) ? 'Collapse' : 'Expand'
-                      }
+                      onClick={() => scrollToSection(item.id)}
+                      className={`flex-1 flex items-center gap-2 text-sm transition-all duration-200 py-1 px-2 rounded ${
+                        activeSection === item.id
+                          ? 'text-accent font-semibold bg-accent/10'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
+                      }`}
                     >
-                      {expandedSections.has(item.id) ? (
-                        <ChevronDown className="w-4 h-4 text-accent" />
-                      ) : (
-                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                      {activeSection === item.id && (
+                        <ChevronRight className="w-3 h-3 flex-shrink-0" />
                       )}
+                      <span>{item.label}</span>
                     </button>
+                    {isSectionExpandable(item) && (
+                      <button
+                        onClick={() => toggleExpanded(item.id)}
+                        className="p-1 hover:bg-muted/30 rounded transition-colors"
+                        aria-label={
+                          expandedSections.has(item.id) ? 'Collapse' : 'Expand'
+                        }
+                      >
+                        {expandedSections.has(item.id) ? (
+                          <ChevronDown className="w-4 h-4 text-accent" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                        )}
+                      </button>
+                    )}
+                  </div>
+                  {isSectionExpandable(item) && expandedSections.has(item.id) && (
+                    <ul className="ml-4 mt-1 space-y-1 border-l border-border pl-3">
+                      {item.subsections!.map((sub) => (
+                        <li key={sub.id}>
+                          <button
+                            onClick={() => scrollToSection(item.id)}
+                            className="flex items-center gap-2 text-xs transition-all duration-200 py-1 px-2 rounded text-muted-foreground hover:text-foreground hover:bg-muted/30 w-full text-left"
+                          >
+                            <span className="w-1.5 h-1.5 rounded-full bg-accent/50 flex-shrink-0" />
+                            <span>{sub.label}</span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
                   )}
-                </div>
-                {isSectionExpandable(item) && expandedSections.has(item.id) && (
-                  <ul className="ml-4 mt-1 space-y-1 border-l border-border pl-3">
-                    {item.subsections!.map((sub) => (
-                      <li key={sub.id}>
-                        <button
-                          onClick={() => scrollToSection(item.id)}
-                          className="flex items-center gap-2 text-xs transition-all duration-200 py-1 px-2 rounded text-muted-foreground hover:text-foreground hover:bg-muted/30 w-full text-left"
-                        >
-                          <span className="w-1.5 h-1.5 rounded-full bg-accent/50 flex-shrink-0" />
-                          <span>{sub.label}</span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                </li>
+              ))
+            ) : (
+              <li className="py-4 text-center">
+                <p className="text-sm text-muted-foreground">No sections found</p>
               </li>
-            ))}
+            )}
           </ul>
         </nav>
       </aside>
