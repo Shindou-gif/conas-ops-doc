@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { ChevronRight } from 'lucide-react';
 
 /**
  * Design Philosophy: Minimalist Institutional
@@ -93,6 +94,16 @@ This document has been produced under the oversight of the CONAS Faction Leader 
 
 export default function Home() {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
+  const [activeSection, setActiveSection] = useState<string>('logo-section');
+
+  const tableOfContents = [
+    { id: 'logo-section', label: 'Overview' },
+    { id: 'overview-section', label: 'What is CONAS?' },
+    { id: 'objectives-section', label: 'Strategic Objectives' },
+    { id: 'civil-section', label: 'Civil Branch' },
+    { id: 'defense-section', label: 'Defense Branch' },
+    { id: 'ack-section', label: 'Acknowledgements' },
+  ];
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -104,10 +115,12 @@ export default function Home() {
               newSet.add(entry.target.id);
               return newSet;
             });
+            // Update active section when it comes into view
+            setActiveSection(entry.target.id);
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.3 }
     );
 
     document.querySelectorAll('[data-section]').forEach((el) => {
@@ -117,27 +130,61 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      setActiveSection(sectionId);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-        <div className="container py-6 flex items-center gap-6">
-          <img
-            src="/manus-storage/Coalition_Of_Nations_For_Anomalous_Security..._569aa721.png"
-            alt="CONAS Logo"
-            className="w-20 h-20 flex-shrink-0"
-          />
-          <div>
-            <h1 className="text-3xl font-bold text-accent">CONAS</h1>
-            <p className="text-sm text-muted-foreground mt-1">General Operations Document</p>
-          </div>
-        </div>
-      </header>
+      {/* Table of Contents Sidebar - Mobile Friendly */}
+      <aside className="hidden lg:block fixed left-0 top-0 w-64 h-screen bg-card border-r border-border pt-24 overflow-y-auto">
+        <nav className="px-6 py-8">
+          <h3 className="text-sm font-semibold text-accent uppercase tracking-wide mb-6">Contents</h3>
+          <ul className="space-y-3">
+            {tableOfContents.map((item) => (
+              <li key={item.id}>
+                <button
+                  onClick={() => scrollToSection(item.id)}
+                  className={`flex items-center gap-2 text-sm transition-all duration-200 ${
+                    activeSection === item.id
+                      ? 'text-accent font-semibold'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {activeSection === item.id && <ChevronRight className="w-4 h-4" />}
+                  <span>{item.label}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </aside>
 
-      {/* Main Content */}
-      <main className="container py-12">
-        {/* Logo Hero Section */}
-        <section
+      {/* Main Content Wrapper */}
+      <div className="lg:ml-64">
+        {/* Header */}
+        <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+          <div className="container py-6 flex items-center gap-6">
+            <img
+              src="/manus-storage/Coalition_Of_Nations_For_Anomalous_Security..._569aa721.png"
+              alt="CONAS Logo"
+              className="w-20 h-20 flex-shrink-0"
+            />
+            <div>
+              <h1 className="text-3xl font-bold text-accent">CONAS</h1>
+              <p className="text-sm text-muted-foreground mt-1">General Operations Document</p>
+            </div>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <main className="container py-12">
+          {/* Logo Hero Section */}
+          <section
           data-section
           id="logo-section"
           className={`mb-16 text-center transition-all duration-700 ${
@@ -153,8 +200,8 @@ export default function Home() {
           />
         </section>
 
-        {/* Intro Section */}
-        <section
+          {/* Intro Section */}
+          <section
           data-section
           id="intro-section"
           className={`mb-16 transition-all duration-700 delay-100 ${
@@ -178,8 +225,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Overview Section */}
-        <section
+          {/* Overview Section */}
+          <section
           data-section
           id="overview-section"
           className={`mb-16 transition-all duration-700 delay-200 ${
@@ -246,8 +293,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Strategic Objectives */}
-        <section
+          {/* Strategic Objectives */}
+          <section
           data-section
           id="objectives-section"
           className={`mb-16 transition-all duration-700 delay-300 ${
@@ -273,8 +320,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Civil Branch */}
-        <section
+          {/* Civil Branch */}
+          <section
           data-section
           id="civil-section"
           className={`mb-16 transition-all duration-700 delay-400 ${
@@ -344,8 +391,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Defense Branch */}
-        <section
+          {/* Defense Branch */}
+          <section
           data-section
           id="defense-section"
           className={`mb-16 transition-all duration-700 delay-500 ${
@@ -410,8 +457,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Acknowledgements */}
-        <section
+          {/* Acknowledgements */}
+          <section
           data-section
           id="ack-section"
           className={`mb-16 transition-all duration-700 delay-600 ${
@@ -446,7 +493,8 @@ export default function Home() {
             Coalition of Nations for Anomalous Security © 2026
           </p>
         </footer>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }
