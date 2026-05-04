@@ -121,19 +121,43 @@ export default function Home() {
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-        <div className="container py-6">
-          <h1 className="text-3xl font-bold text-accent">CONAS</h1>
-          <p className="text-sm text-muted-foreground mt-1">General Operations Document</p>
+        <div className="container py-6 flex items-center gap-6">
+          <img
+            src="/manus-storage/Coalition_Of_Nations_For_Anomalous_Security..._569aa721.png"
+            alt="CONAS Logo"
+            className="w-20 h-20 flex-shrink-0"
+          />
+          <div>
+            <h1 className="text-3xl font-bold text-accent">CONAS</h1>
+            <p className="text-sm text-muted-foreground mt-1">General Operations Document</p>
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="container py-12">
+        {/* Logo Hero Section */}
+        <section
+          data-section
+          id="logo-section"
+          className={`mb-16 text-center transition-all duration-700 ${
+            visibleSections.has('logo-section')
+              ? 'opacity-100 translate-y-0'
+              : 'opacity-0 translate-y-4'
+          }`}
+        >
+          <img
+            src="/manus-storage/Coalition_Of_Nations_For_Anomalous_Security..._569aa721.png"
+            alt="CONAS Logo"
+            className="w-48 h-48 mx-auto mb-8"
+          />
+        </section>
+
         {/* Intro Section */}
         <section
           data-section
           id="intro-section"
-          className={`mb-16 transition-all duration-700 ${
+          className={`mb-16 transition-all duration-700 delay-100 ${
             visibleSections.has('intro-section')
               ? 'opacity-100 translate-y-0'
               : 'opacity-0 translate-y-4'
@@ -158,7 +182,7 @@ export default function Home() {
         <section
           data-section
           id="overview-section"
-          className={`mb-16 transition-all duration-700 delay-100 ${
+          className={`mb-16 transition-all duration-700 delay-200 ${
             visibleSections.has('overview-section')
               ? 'opacity-100 translate-y-0'
               : 'opacity-0 translate-y-4'
@@ -226,7 +250,7 @@ export default function Home() {
         <section
           data-section
           id="objectives-section"
-          className={`mb-16 transition-all duration-700 delay-200 ${
+          className={`mb-16 transition-all duration-700 delay-300 ${
             visibleSections.has('objectives-section')
               ? 'opacity-100 translate-y-0'
               : 'opacity-0 translate-y-4'
@@ -253,7 +277,7 @@ export default function Home() {
         <section
           data-section
           id="civil-section"
-          className={`mb-16 transition-all duration-700 delay-300 ${
+          className={`mb-16 transition-all duration-700 delay-400 ${
             visibleSections.has('civil-section')
               ? 'opacity-100 translate-y-0'
               : 'opacity-0 translate-y-4'
@@ -324,7 +348,7 @@ export default function Home() {
         <section
           data-section
           id="defense-section"
-          className={`mb-16 transition-all duration-700 delay-400 ${
+          className={`mb-16 transition-all duration-700 delay-500 ${
             visibleSections.has('defense-section')
               ? 'opacity-100 translate-y-0'
               : 'opacity-0 translate-y-4'
@@ -390,7 +414,7 @@ export default function Home() {
         <section
           data-section
           id="ack-section"
-          className={`mb-16 transition-all duration-700 delay-500 ${
+          className={`mb-16 transition-all duration-700 delay-600 ${
             visibleSections.has('ack-section')
               ? 'opacity-100 translate-y-0'
               : 'opacity-0 translate-y-4'
